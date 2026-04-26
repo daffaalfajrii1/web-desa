@@ -11,17 +11,17 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $role = Role::firstOrCreate(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'super_admin']);
 
         $admin = User::firstOrCreate(
             ['email' => 'admin@desa.test'],
             [
                 'name' => 'Administrator',
-                'password' => Hash::make('admin12345'),
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
 
-        $admin->assignRole($role);
+        $admin->syncRoles(['super_admin']);
     }
 }

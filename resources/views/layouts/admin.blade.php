@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -230,7 +230,7 @@
                 </div>
                 <div class="info">
                     <a href="#" class="d-block">{{ auth()->user()->name }}</a>
-                    <small>{{ implode(', ', auth()->user()->getRoleNames()->toArray()) }}</small>
+                    <small>{{ implode(', ', auth()->user()->getRoleNames()->toArray()) ?: 'Tanpa Role' }}</small>
                 </div>
             </div>
 
@@ -249,154 +249,219 @@
                         </a>
                     </li>
 
-                    <li class="nav-header">Master Data</li>
+                    @canany(['manage settings', 'manage profil-desa'])
+                        <li class="nav-header">Master Data</li>
+                    @endcanany
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.settings.desa.edit') }}"
-                           class="nav-link {{ request()->routeIs('admin.settings.desa.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-building"></i>
-                            <p>Identitas Desa</p>
-                        </a>
-                    </li>
+                    @can('manage settings')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.settings.desa.edit') }}"
+                               class="nav-link {{ request()->routeIs('admin.settings.desa.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>Identitas Desa</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item has-treeview {{ request()->routeIs('admin.profil-desa.*') ? 'menu-open' : '' }}">
-                        <a href="#"
-                           class="nav-link {{ request()->routeIs('admin.profil-desa.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-alt"></i>
-                            <p>
-                                Profil Desa
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
+                    @can('manage profil-desa')
+                        <li class="nav-item has-treeview {{ request()->routeIs('admin.profil-desa.*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->routeIs('admin.profil-desa.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>
+                                    Profil Desa
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
 
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.profil-desa.halaman.index') }}"
-                                   class="nav-link {{ request()->routeIs('admin.profil-desa.halaman.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Halaman Profil</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.profil-desa.menu.index') }}"
-                                   class="nav-link {{ request()->routeIs('admin.profil-desa.menu.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Menu Profil</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.profil-desa.halaman.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.profil-desa.halaman.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Halaman Profil</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.profil-desa.menu.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.profil-desa.menu.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Menu Profil</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
 
-                    <li class="nav-header">Informasi</li>
+                    @canany(['manage berita', 'manage pengumuman', 'manage agenda', 'manage produk-hukum', 'manage informasi-publik', 'manage ppid'])
+                        <li class="nav-header">Informasi</li>
+                    @endcanany
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.berita.index') }}"
-                           class="nav-link {{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-newspaper"></i>
-                            <p>Berita</p>
-                        </a>
-                    </li>
+                    @can('manage berita')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.berita.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-newspaper"></i>
+                                <p>Berita</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.kategori-berita.index') }}"
-                           class="nav-link {{ request()->routeIs('admin.kategori-berita.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>Kategori Berita</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.kategori-berita.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.kategori-berita.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Kategori Berita</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.produk-hukum.index') }}"
-                           class="nav-link {{ request()->routeIs('admin.produk-hukum.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-balance-scale"></i>
-                            <p>Produk Hukum</p>
-                        </a>
-                    </li>
+                    @can('manage pengumuman')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.pengumuman.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.pengumuman.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-bullhorn"></i>
+                                <p>Pengumuman</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.kategori-produk-hukum.index') }}"
-                           class="nav-link {{ request()->routeIs('admin.kategori-produk-hukum.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>Kategori Produk Hukum</p>
-                        </a>
-                    </li>
+                    @can('manage agenda')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.agenda.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.agenda.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-calendar-alt"></i>
+                                <p>Agenda</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-    <a href="{{ route('admin.informasi-publik.index') }}"
-       class="nav-link {{ request()->routeIs('admin.informasi-publik.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-info-circle"></i>
-        <p>Informasi Publik</p>
-    </a>
-</li>
+                    @can('manage produk-hukum')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.produk-hukum.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.produk-hukum.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-balance-scale"></i>
+                                <p>Produk Hukum</p>
+                            </a>
+                        </li>
 
-<li class="nav-item">
-    <a href="{{ route('admin.pengumuman.index') }}"
-       class="nav-link {{ request()->routeIs('admin.pengumuman.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-bullhorn"></i>
-        <p>Pengumuman</p>
-    </a>
-</li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.kategori-produk-hukum.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.kategori-produk-hukum.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Kategori Produk Hukum</p>
+                            </a>
+                        </li>
+                    @endcan
 
-<li class="nav-item">
-    <a href="{{ route('admin.agenda.index') }}"
-       class="nav-link {{ request()->routeIs('admin.agenda.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-calendar-alt"></i>
-        <p>Agenda</p>
-    </a>
-</li>
-                    <li class="nav-item">
-                        <a href="#"
-                           class="nav-link {{ request()->routeIs('admin.ppid.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-envelope-open-text"></i>
-                            <p>PPID</p>
-                        </a>
-                    </li>
+                    @can('manage informasi-publik')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.informasi-publik.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.informasi-publik.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-info-circle"></i>
+                                <p>Informasi Publik</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-header">Lainnya</li>
+                    @can('manage ppid')
+                        <li class="nav-item has-treeview {{ request()->routeIs('admin.ppid-section.*') || request()->routeIs('admin.ppid-document.*') || request()->routeIs('admin.ppid-request.*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ request()->routeIs('admin.ppid-section.*') || request()->routeIs('admin.ppid-document.*') || request()->routeIs('admin.ppid-request.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-envelope-open-text"></i>
+                                <p>
+                                    PPID
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-pie"></i>
-                            <p>Infografis</p>
-                        </a>
-                    </li>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.ppid-section.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.ppid-section.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>FAQ / Section PPID</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.ppid-document.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.ppid-document.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Dokumen PPID</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.ppid-request.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.ppid-request.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Permohonan Informasi</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-store"></i>
-                            <p>Lapak Desa</p>
-                        </a>
-                    </li>
+                    @can('manage lapak')
+    <li class="nav-item">
+        <a href="{{ route('admin.lapak.index') }}"
+           class="nav-link {{ request()->routeIs('admin.lapak.*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-store"></i>
+            <p>Lapak Desa</p>
+        </a>
+    </li>
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-map-marked-alt"></i>
-                            <p>Wisata</p>
-                        </a>
-                    </li>
+    <li class="nav-item">
+        <a href="{{ route('admin.kategori-lapak.index') }}"
+           class="nav-link {{ request()->routeIs('admin.kategori-lapak.*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-tags"></i>
+            <p>Kategori Lapak</p>
+        </a>
+    </li>
+@endcan
 
-                    <li class="nav-header">Organisasi</li>
+                    @canany(['manage users', 'manage roles'])
+                        <li class="nav-header">Manajemen Akses</li>
+                    @endcanany
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-sitemap"></i>
-                            <p>SOTK</p>
-                        </a>
-                    </li>
+                    @can('manage users')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.users.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-users-cog"></i>
+                                <p>Manajemen User</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Pegawai</p>
-                        </a>
-                    </li>
+                    @can('manage roles')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.roles.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-shield"></i>
+                                <p>Role & Permission</p>
+                            </a>
+                        </li>
+                    @endcan
 
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-qrcode"></i>
-                            <p>Absensi</p>
-                        </a>
-                    </li>
+                    @canany(['manage sotk', 'manage absensi'])
+                        <li class="nav-header">Organisasi</li>
+                    @endcanany
+
+                    @can('manage sotk')
+    <li class="nav-item">
+        <a href="{{ route('admin.pegawai.index') }}"
+           class="nav-link {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-users"></i>
+            <p>Pegawai / SOTK</p>
+        </a>
+    </li>
+@endcan
+
+                    @can('manage absensi')
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-qrcode"></i>
+                                <p>Absensi</p>
+                            </a>
+                        </li>
+                    @endcan
 
                 </ul>
             </nav>

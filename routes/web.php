@@ -20,6 +20,16 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\ShopCategoryController;
+use App\Http\Controllers\Admin\TourismController;
+use App\Http\Controllers\Admin\HamletController;
+use App\Http\Controllers\Admin\PopulationSummaryController;
+use App\Http\Controllers\Admin\PopulationStatController;
+use App\Http\Controllers\Admin\PopulationImportController;
+use App\Http\Controllers\Admin\ApbdesController;
+use App\Http\Controllers\Admin\SocialAssistanceProgramController;
+use App\Http\Controllers\Admin\SocialAssistanceRecipientController;
+use App\Http\Controllers\Admin\SocialAssistanceChartController;
+use App\Http\Controllers\BansosPublicController;
 
 Route::get('/', function () {
     return view('frontend.home');
@@ -99,6 +109,43 @@ Route::middleware('permission:manage lapak')->group(function () {
     Route::resource('lapak', ShopController::class);
     Route::resource('kategori-lapak', ShopCategoryController::class)->except(['show']);
 });
+Route::middleware('permission:manage wisata')->group(function () {
+    Route::resource('wisata', TourismController::class)->parameters([
+        'wisata' => 'tourism',
+    ]);
+});
+
+Route::middleware('permission:manage infografis')->group(function () {
+    Route::resource('hamlets', HamletController::class)->except(['show']);
+    Route::resource('population-summaries', PopulationSummaryController::class)->except(['show']);
+    Route::get('population-stats/chart-view', [PopulationStatController::class, 'chartView'])
+        ->name('population-stats.chart-view');
+    Route::resource('population-stats', PopulationStatController::class)->except(['show']);
+
+    Route::get('population-summaries/template', [PopulationImportController::class, 'templateSummaries'])
+        ->name('population-summaries.template');
+    Route::post('population-summaries/import', [PopulationImportController::class, 'importSummaries'])
+        ->name('population-summaries.import');
+
+    Route::get('population-stats/template', [PopulationImportController::class, 'templateStats'])
+        ->name('population-stats.template');
+    Route::post('population-stats/import', [PopulationImportController::class, 'importStats'])
+        ->name('population-stats.import');
+    Route::resource('apbdes', ApbdesController::class)->except(['show']);
+
+    Route::get('apbdes/export/excel', [ApbdesController::class, 'exportExcel'])
+    ->name('apbdes.export-excel');
+
+    Route::get('apbdes/chart-view', [ApbdesController::class, 'chartView'])
+    ->name('apbdes.chart-view');
+
+    Route::resource('bansos-program', SocialAssistanceProgramController::class)->except(['show']);
+    Route::resource('bansos-recipient', SocialAssistanceRecipientController::class)->except(['show']);
+    Route::get('bansos-chart', [SocialAssistanceChartController::class, 'index'])->name('bansos-chart.index');
+    
+});
+
+
     });
 
 require __DIR__.'/auth.php';

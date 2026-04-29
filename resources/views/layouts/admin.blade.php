@@ -21,6 +21,10 @@
             --sidebar-muted: rgba(255,255,255,0.55);
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-size: 15px;
         }
@@ -41,6 +45,26 @@
             font-weight: 600 !important;
             letter-spacing: .2px;
             color: #fff;
+        }
+
+        .brand-image {
+            object-fit: cover;
+        }
+
+        .sidebar {
+            height: calc(100vh - 57px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.15);
+            border-radius: 10px;
         }
 
         .user-panel {
@@ -125,6 +149,7 @@
 
         .content-wrapper {
             background: #f4f6f9;
+            min-height: 100vh !important;
         }
 
         .content-header {
@@ -174,6 +199,53 @@
             display: none !important;
         }
 
+        .small-box {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .small-box .inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .small-box .icon {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 1;
+            font-size: 56px;
+            line-height: 1;
+            opacity: 0.10;
+            transition: transform .2s ease-in-out;
+        }
+
+        .small-box:hover .icon {
+            transform: scale(1.05);
+        }
+
+        .small-box .icon i {
+            color: rgba(0, 0, 0, 0.18);
+        }
+
+        .small-box h5,
+        .small-box h3,
+        .small-box p {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 0;
+        }
+
+        .small-box h5 {
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .info-box .info-box-icon i {
+            font-size: 28px;
+        }
+
         @media (max-width: 991.98px) {
             .content-header h1 {
                 font-size: 1.7rem;
@@ -184,7 +256,6 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-    {{-- Navbar --}}
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -206,7 +277,6 @@
         </ul>
     </nav>
 
-    {{-- Sidebar --}}
     <aside class="main-sidebar elevation-4">
         <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <img
@@ -219,7 +289,6 @@
         </a>
 
         <div class="sidebar">
-            {{-- User Panel --}}
             <div class="user-panel mt-3 mb-3 d-flex align-items-center">
                 <div class="image">
                     <img
@@ -234,7 +303,6 @@
                 </div>
             </div>
 
-            {{-- Sidebar Menu --}}
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column"
                     data-widget="treeview"
@@ -265,7 +333,9 @@
 
                     @can('manage profil-desa')
                         <li class="nav-item has-treeview {{ request()->routeIs('admin.profil-desa.*') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ request()->routeIs('admin.profil-desa.*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link {{ request()->routeIs('admin.profil-desa.*') ? 'active' : '' }}"
+                               data-menu-key="profil-desa">
                                 <i class="nav-icon fas fa-file-alt"></i>
                                 <p>
                                     Profil Desa
@@ -292,7 +362,7 @@
                         </li>
                     @endcan
 
-                    @canany(['manage berita', 'manage pengumuman', 'manage agenda', 'manage produk-hukum', 'manage informasi-publik', 'manage ppid'])
+                    @canany(['manage berita', 'manage pengumuman', 'manage agenda', 'manage produk-hukum', 'manage informasi-publik', 'manage ppid', 'manage lapak', 'manage wisata'])
                         <li class="nav-header">Informasi</li>
                     @endcanany
 
@@ -364,7 +434,9 @@
 
                     @can('manage ppid')
                         <li class="nav-item has-treeview {{ request()->routeIs('admin.ppid-section.*') || request()->routeIs('admin.ppid-document.*') || request()->routeIs('admin.ppid-request.*') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ request()->routeIs('admin.ppid-section.*') || request()->routeIs('admin.ppid-document.*') || request()->routeIs('admin.ppid-request.*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link {{ request()->routeIs('admin.ppid-section.*') || request()->routeIs('admin.ppid-document.*') || request()->routeIs('admin.ppid-request.*') ? 'active' : '' }}"
+                               data-menu-key="ppid">
                                 <i class="nav-icon fas fa-envelope-open-text"></i>
                                 <p>
                                     PPID
@@ -399,22 +471,92 @@
                     @endcan
 
                     @can('manage lapak')
-    <li class="nav-item">
-        <a href="{{ route('admin.lapak.index') }}"
-           class="nav-link {{ request()->routeIs('admin.lapak.*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-store"></i>
-            <p>Lapak Desa</p>
-        </a>
-    </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.lapak.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.lapak.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-store"></i>
+                                <p>Lapak Desa</p>
+                            </a>
+                        </li>
 
-    <li class="nav-item">
-        <a href="{{ route('admin.kategori-lapak.index') }}"
-           class="nav-link {{ request()->routeIs('admin.kategori-lapak.*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-tags"></i>
-            <p>Kategori Lapak</p>
-        </a>
-    </li>
-@endcan
+                        <li class="nav-item">
+                            <a href="{{ route('admin.kategori-lapak.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.kategori-lapak.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Kategori Lapak</p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('manage wisata')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.wisata.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.wisata.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-map-marked-alt"></i>
+                                <p>Wisata</p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('manage infografis')
+                        <li class="nav-item has-treeview {{ request()->routeIs('admin.hamlets.*') || request()->routeIs('admin.population-summaries.*') || request()->routeIs('admin.population-stats.*') || request()->routeIs('admin.apbdes.*') ? 'menu-open' : '' }}">
+                            <a href="#"
+                               class="nav-link {{ request()->routeIs('admin.hamlets.*') || request()->routeIs('admin.population-summaries.*') || request()->routeIs('admin.population-stats.*') || request()->routeIs('admin.apbdes.*') ? 'active' : '' }}"
+                               data-menu-key="infografis">
+                                <i class="nav-icon fas fa-chart-pie"></i>
+                                <p>
+                                    Infografis
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.hamlets.index') }}" class="nav-link {{ request()->routeIs('admin.hamlets.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Data Dusun</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.population-summaries.index') }}" class="nav-link {{ request()->routeIs('admin.population-summaries.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Ringkasan Penduduk</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.population-stats.index') }}" class="nav-link {{ request()->routeIs('admin.population-stats.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Statistik Penduduk</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.apbdes.index') }}" class="nav-link {{ request()->routeIs('admin.apbdes.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>APBDes</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+    <a href="{{ route('admin.bansos-program.index') }}" class="nav-link {{ request()->routeIs('admin.bansos-program.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Program Bansos</p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ route('admin.bansos-recipient.index') }}" class="nav-link {{ request()->routeIs('admin.bansos-recipient.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Penerima Bansos</p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ route('admin.bansos-chart.index') }}" class="nav-link {{ request()->routeIs('admin.bansos-chart.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Chart Bansos</p>
+    </a>
+</li>
+                            </ul>
+                        </li>
+                    @endcan
 
                     @canany(['manage users', 'manage roles'])
                         <li class="nav-header">Manajemen Akses</li>
@@ -445,14 +587,14 @@
                     @endcanany
 
                     @can('manage sotk')
-    <li class="nav-item">
-        <a href="{{ route('admin.pegawai.index') }}"
-           class="nav-link {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-users"></i>
-            <p>Pegawai / SOTK</p>
-        </a>
-    </li>
-@endcan
+                        <li class="nav-item">
+                            <a href="{{ route('admin.pegawai.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Pegawai / SOTK</p>
+                            </a>
+                        </li>
+                    @endcan
 
                     @can('manage absensi')
                         <li class="nav-item">
@@ -462,13 +604,11 @@
                             </a>
                         </li>
                     @endcan
-
                 </ul>
             </nav>
         </div>
     </aside>
 
-    {{-- Content Wrapper --}}
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -487,17 +627,48 @@
         </section>
     </div>
 
-    {{-- Footer --}}
     <footer class="main-footer">
         Web Desa Admin
     </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
 @stack('scripts')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.querySelector('.main-sidebar .sidebar');
+        if (sidebar) {
+            const savedScroll = localStorage.getItem('admin_sidebar_scroll');
+            if (savedScroll !== null) {
+                sidebar.scrollTop = parseInt(savedScroll, 10);
+            }
+
+            sidebar.addEventListener('scroll', function () {
+                localStorage.setItem('admin_sidebar_scroll', sidebar.scrollTop);
+            });
+        }
+
+        const treeLinks = document.querySelectorAll('.nav-sidebar .nav-link[data-menu-key]');
+        treeLinks.forEach(function(link) {
+            const key = 'menu_open_' + link.dataset.menuKey;
+            const parent = link.closest('.has-treeview');
+
+            if (localStorage.getItem(key) === '1' && parent) {
+                parent.classList.add('menu-open');
+            }
+
+            link.addEventListener('click', function() {
+                if (!parent) return;
+                const willOpen = !parent.classList.contains('menu-open');
+                localStorage.setItem(key, willOpen ? '1' : '0');
+            });
+        });
+    });
+</script>
 </body>
 </html>

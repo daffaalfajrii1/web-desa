@@ -29,6 +29,12 @@ use App\Http\Controllers\Admin\ApbdesController;
 use App\Http\Controllers\Admin\SocialAssistanceProgramController;
 use App\Http\Controllers\Admin\SocialAssistanceRecipientController;
 use App\Http\Controllers\Admin\SocialAssistanceChartController;
+use App\Http\Controllers\Admin\StuntingRecordController;
+use App\Http\Controllers\Admin\StuntingChartController;
+use App\Http\Controllers\Admin\IdmSummaryController;
+use App\Http\Controllers\Admin\IdmIndicatorController;
+use App\Http\Controllers\Admin\SdgsSummaryController;
+use App\Http\Controllers\Admin\SdgsGoalValueController;
 use App\Http\Controllers\BansosPublicController;
 
 Route::get('/', function () {
@@ -142,7 +148,14 @@ Route::middleware('permission:manage infografis')->group(function () {
     Route::resource('bansos-program', SocialAssistanceProgramController::class)->except(['show']);
     Route::resource('bansos-recipient', SocialAssistanceRecipientController::class)->except(['show']);
     Route::get('bansos-chart', [SocialAssistanceChartController::class, 'index'])->name('bansos-chart.index');
-    
+
+    Route::resource('stunting-records', StuntingRecordController::class)->except(['show']);
+Route::get('stunting-chart', [StuntingChartController::class, 'index'])->name('stunting-chart.index');
+Route::get('stunting-records/export/excel', [StuntingRecordController::class, 'exportExcel'])->name('stunting-records.export-excel');
+Route::resource('idm-summaries', IdmSummaryController::class);
+Route::resource('idm-indicators', IdmIndicatorController::class)->except(['show']);
+Route::resource('sdgs-summaries', SdgsSummaryController::class);
+Route::resource('sdgs-goal-values', SdgsGoalValueController::class)->except(['show']);
 });
 
 

@@ -1,0 +1,256 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\IdmSummary;
+use App\Models\IdmIndicator;
+
+class IdmDummySeeder extends Seeder
+{
+    public function run(): void
+    {
+        IdmIndicator::query()->delete();
+        IdmSummary::query()->delete();
+
+        $summary2023 = IdmSummary::create([
+            'year' => 2023,
+            'iks_score' => 0.7920,
+            'ike_score' => 0.6700,
+            'ikl_score' => 0.9010,
+            'idm_score' => 0.7877,
+            'idm_status' => 'Maju',
+            'target_status' => 'Mandiri',
+            'minimal_target_score' => 0.8156,
+            'additional_score_needed' => 0.0279,
+            'description' => 'Ringkasan IDM tahun 2023',
+            'is_active' => true,
+        ]);
+
+        $summary2024 = IdmSummary::create([
+            'year' => 2024,
+            'iks_score' => 0.8114,
+            'ike_score' => 0.6833,
+            'ikl_score' => 0.9333,
+            'idm_score' => 0.8094,
+            'idm_status' => 'Maju',
+            'target_status' => 'Mandiri',
+            'minimal_target_score' => 0.8156,
+            'additional_score_needed' => 0.0062,
+            'description' => 'Ringkasan IDM tahun 2024',
+            'is_active' => true,
+        ]);
+
+        $indicators2024 = [
+            [
+                'category' => 'IKS',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Akses Sarkes',
+                'score' => 5,
+                'description' => 'Waktu tempuh dari <= 30 menit',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => '',
+                'executor_regency' => 'Dinkes, PU',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 1,
+            ],
+            [
+                'category' => 'IKS',
+                'indicator_no' => 2,
+                'indicator_name' => 'Skor Dokter',
+                'score' => 0,
+                'description' => 'Jumlah dokter tidak ada',
+                'activity' => 'Pengadaan minimal 1 orang dokter',
+                'value' => 0.0095,
+                'executor_central' => '',
+                'executor_province' => '',
+                'executor_regency' => 'DINKES',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 2,
+            ],
+            [
+                'category' => 'IKS',
+                'indicator_no' => 3,
+                'indicator_name' => 'Skor Bidan',
+                'score' => 5,
+                'description' => 'Jumlah bidan >= 1 orang',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => '',
+                'executor_regency' => 'DINKES',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 3,
+            ],
+            [
+                'category' => 'IKE',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Keragaman Produksi',
+                'score' => 5,
+                'description' => 'Jumlah industri mikro / jumlah KK >= 0,004',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => 'DISPERINDAGKOP UKM',
+                'executor_regency' => 'DISPERINDAGKOP UKM',
+                'executor_village' => 'DD',
+                'executor_csr' => 'CSR',
+                'executor_other' => 'Perorangan',
+                'sort_order' => 1,
+            ],
+            [
+                'category' => 'IKE',
+                'indicator_no' => 2,
+                'indicator_name' => 'Skor Pertokoan',
+                'score' => 1,
+                'description' => 'Jarak ke kelompok pertokoan terdekat > 25 KM',
+                'activity' => 'Pembangunan pusat pertokoan melalui kerjasama antar desa',
+                'value' => 0.0222,
+                'executor_central' => 'Kemenperind, Kemendes',
+                'executor_province' => 'DISPERINDAGKOP UKM',
+                'executor_regency' => 'DISPERINDAGKOP UKM',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => 'Perorangan, Swasta',
+                'sort_order' => 2,
+            ],
+            [
+                'category' => 'IKE',
+                'indicator_no' => 3,
+                'indicator_name' => 'Skor Pasar',
+                'score' => 1,
+                'description' => '(Total KK/jumlah pasar permanen) = 0',
+                'activity' => 'Pembangunan pasar permanen',
+                'value' => 0.0222,
+                'executor_central' => 'Kemenperind, Kemendes',
+                'executor_province' => 'DISPERINDAGKOP UKM',
+                'executor_regency' => 'DISPERINDAGKOP UKM',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 3,
+            ],
+            [
+                'category' => 'IKL',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Kualitas Lingkungan',
+                'score' => 5,
+                'description' => 'Pencemaran air, udara, tanah, limbah disungai di desa = 0',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => 'DLH',
+                'executor_regency' => 'DLH, DINKES',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 1,
+            ],
+            [
+                'category' => 'IKL',
+                'indicator_no' => 2,
+                'indicator_name' => 'Skor Rawan Bencana',
+                'score' => 5,
+                'description' => 'Jenis bencana di desa = 0',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => 'DISHUT/KPH, BPBD',
+                'executor_regency' => 'BPBD',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 2,
+            ],
+            [
+                'category' => 'IKL',
+                'indicator_no' => 3,
+                'indicator_name' => 'Skor Tanggap Bencana',
+                'score' => 4,
+                'description' => 'Fasilitas mitigasi/tanggap bencana tersedia namun belum lengkap',
+                'activity' => 'Pembangunan/pengadaan 1 fasilitas mitigasi bencana',
+                'value' => 0.0222,
+                'executor_central' => 'BNPB, Kemendes',
+                'executor_province' => 'DISHUT/KPH, BPBD, DINSOS',
+                'executor_regency' => 'BPBD, DINSOS',
+                'executor_village' => 'DD',
+                'executor_csr' => 'CSR',
+                'executor_other' => '',
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($indicators2024 as $indicator) {
+            IdmIndicator::create(array_merge($indicator, [
+                'idm_summary_id' => $summary2024->id,
+                'is_active' => true,
+            ]));
+        }
+
+        $indicators2023 = [
+            [
+                'category' => 'IKS',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Akses Sarkes',
+                'score' => 4,
+                'description' => 'Waktu tempuh layanan kesehatan masih di atas 30 menit',
+                'activity' => 'Peningkatan akses layanan kesehatan',
+                'value' => 0.0040,
+                'executor_central' => '',
+                'executor_province' => '',
+                'executor_regency' => 'Dinkes',
+                'executor_village' => 'Desa',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 1,
+            ],
+            [
+                'category' => 'IKE',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Pertokoan',
+                'score' => 1,
+                'description' => 'Pertokoan masih jauh dari wilayah desa',
+                'activity' => 'Mendorong pengembangan pusat ekonomi desa',
+                'value' => 0.0200,
+                'executor_central' => '',
+                'executor_province' => 'DISPERINDAG',
+                'executor_regency' => 'DISPERINDAG',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => 'Swasta',
+                'sort_order' => 1,
+            ],
+            [
+                'category' => 'IKL',
+                'indicator_no' => 1,
+                'indicator_name' => 'Skor Kualitas Lingkungan',
+                'score' => 5,
+                'description' => 'Kondisi lingkungan desa masih baik',
+                'activity' => '-',
+                'value' => 0.0000,
+                'executor_central' => '',
+                'executor_province' => 'DLH',
+                'executor_regency' => 'DLH',
+                'executor_village' => '',
+                'executor_csr' => '',
+                'executor_other' => '',
+                'sort_order' => 1,
+            ],
+        ];
+
+        foreach ($indicators2023 as $indicator) {
+            IdmIndicator::create(array_merge($indicator, [
+                'idm_summary_id' => $summary2023->id,
+                'is_active' => true,
+            ]));
+        }
+    }
+}

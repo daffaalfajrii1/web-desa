@@ -554,6 +554,42 @@
         <p>Chart Bansos</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('admin.stunting-records.index') }}" class="nav-link {{ request()->routeIs('admin.stunting-records.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Stunting</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('admin.idm-summaries.index') }}"
+       class="nav-link {{ request()->routeIs('admin.idm-summaries.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>IDM</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('admin.idm-indicators.index') }}"
+       class="nav-link {{ request()->routeIs('admin.idm-indicators.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Indikator IDM</p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ route('admin.sdgs-summaries.index') }}" class="nav-link {{ request()->routeIs('admin.sdgs-summaries.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>SDGS Ringkasan</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('admin.sdgs-goal-values.index') }}" class="nav-link {{ request()->routeIs('admin.sdgs-goal-values.*') ? 'active' : '' }}">
+        <i class="far fa-circle nav-icon"></i>
+        <p>SDGS Nilai Tujuan</p>
+    </a>
+</li>
                             </ul>
                         </li>
                     @endcan

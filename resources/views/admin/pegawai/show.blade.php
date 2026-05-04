@@ -37,7 +37,7 @@
             <div class="col-md-6">
                 <p><strong>Terkait Akun:</strong> {{ $item->user?->name ?? 'Tidak terhubung' }}</p>
                 <p><strong>Urutan Tampil:</strong> {{ $item->sort_order }}</p>
-                <p><strong>PIN Absensi:</strong> {{ $item->attendance_pin ?? '-' }}</p>
+                <p><strong>PIN Absensi:</strong> {{ $item->pin_absensi ?? $item->attendance_pin ?? '-' }}</p>
                 <p><strong>Status:</strong>
                     @if($item->is_active)
                         <span class="badge badge-success">Aktif</span>

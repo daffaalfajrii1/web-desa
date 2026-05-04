@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'holiday_api' => [
+        'url' => env('INDONESIA_HOLIDAY_API_URL', 'https://api-harilibur.vercel.app/api?year={year}'),
+        'fallback_urls' => [
+            'https://api-hari-libur.vercel.app/api?year={year}',
+            'https://api-harilibur.pages.dev/api?year={year}',
+            'https://api-harilibur.netlify.app/api?year={year}',
+        ],
+        'date_key' => env('INDONESIA_HOLIDAY_API_DATE_KEY', 'holiday_date'),
+        'name_key' => env('INDONESIA_HOLIDAY_API_NAME_KEY', 'holiday_name'),
+        'national_key' => env('INDONESIA_HOLIDAY_API_NATIONAL_KEY', 'is_national_holiday'),
+        'cache_ttl' => env('INDONESIA_HOLIDAY_API_CACHE_TTL', 86400),
+    ],
+
 ];

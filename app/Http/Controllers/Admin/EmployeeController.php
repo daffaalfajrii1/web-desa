@@ -7,7 +7,7 @@ use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
             'telegram' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
-            'attendance_pin' => 'nullable|string|max:20',
+            'pin_absensi' => ['required', 'string', 'min:4', 'max:20', Rule::unique('employees', 'pin_absensi')],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -117,7 +117,7 @@ class EmployeeController extends Controller
             'telegram' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
-            'attendance_pin' => 'nullable|string|max:20',
+            'pin_absensi' => ['required', 'string', 'min:4', 'max:20', Rule::unique('employees', 'pin_absensi')->ignore($pegawai->id)],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');

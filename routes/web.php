@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VillageSettingController;
+use App\Http\Controllers\Admin\VillageBannerController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProfileMenuController;
 use App\Http\Controllers\Admin\EditorUploadController;
@@ -15,12 +17,21 @@ use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\PpidSectionController;
 use App\Http\Controllers\Admin\PpidDocumentController;
 use App\Http\Controllers\Admin\PpidRequestController;
+use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Admin\SelfServiceController;
+use App\Http\Controllers\Admin\SelfServiceFieldController;
+use App\Http\Controllers\Admin\SelfServiceSubmissionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\AttendanceCheckController;
+use App\Http\Controllers\Admin\AttendanceHolidayController;
+use App\Http\Controllers\Admin\AttendanceSettingController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\ShopCategoryController;
 use App\Http\Controllers\Admin\TourismController;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\HamletController;
 use App\Http\Controllers\Admin\PopulationSummaryController;
 use App\Http\Controllers\Admin\PopulationStatController;
@@ -41,14 +52,16 @@ Route::get('/', function () {
     return view('frontend.home');
 })->name('home');
 
+Route::middleware(['auth'])->get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
+})->name('dashboard');
+
 Route::middleware(['auth'])
     ->prefix('admin')
     ->as('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::post('/editor/upload', [EditorUploadController::class, 'upload'])->name('editor.upload');
 
@@ -56,6 +69,10 @@ Route::middleware(['auth'])
             Route::prefix('settings')->as('settings.')->group(function () {
                 Route::get('/desa', [VillageSettingController::class, 'edit'])->name('desa.edit');
                 Route::put('/desa', [VillageSettingController::class, 'update'])->name('desa.update');
+                Route::put('/desa-banners/{village_banner}/toggle', [VillageBannerController::class, 'toggle'])->name('desa-banners.toggle');
+                Route::resource('/desa-banners', VillageBannerController::class)
+                    ->parameters(['desa-banners' => 'village_banner'])
+                    ->except(['show']);
             });
         });
 
@@ -98,6 +115,26 @@ Route::middleware(['auth'])
             Route::resource('ppid-request', PpidRequestController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
         });
 
+        Route::middleware('role_or_permission:super_admin|manage layanan')->group(function () {
+            Route::resource('pengaduan', ComplaintController::class)->only(['index', 'show', 'edit', 'update']);
+
+            Route::resource('layanan-mandiri', SelfServiceController::class)
+                ->parameters(['layanan-mandiri' => 'self_service'])
+                ->except(['show']);
+
+            Route::prefix('layanan-mandiri/{self_service}')
+                ->as('layanan-mandiri.')
+                ->group(function () {
+                    Route::resource('fields', SelfServiceFieldController::class)
+                        ->parameters(['fields' => 'self_service_field'])
+                        ->except(['show']);
+
+                    Route::resource('submissions', SelfServiceSubmissionController::class)
+                        ->parameters(['submissions' => 'submission'])
+                        ->only(['index', 'show', 'edit', 'update']);
+                });
+        });
+
         Route::middleware('permission:manage users')->group(function () {
             Route::resource('users', UserController::class)->except(['show']);
             Route::put('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
@@ -107,8 +144,29 @@ Route::middleware(['auth'])
             Route::resource('roles', RoleController::class)->except(['show']);
         });
 
-        Route::middleware('permission:manage sotk')->group(function () {
+Route::middleware('permission:manage sotk')->group(function () {
     Route::resource('pegawai', EmployeeController::class);
+});
+
+Route::middleware('permission:manage absensi')->prefix('absensi')->as('absensi.')->group(function () {
+    Route::get('input', [AttendanceCheckController::class, 'index'])->name('input');
+    Route::post('check-in', [AttendanceCheckController::class, 'checkIn'])->name('check-in');
+    Route::post('check-out', [AttendanceCheckController::class, 'checkOut'])->name('check-out');
+
+    Route::get('settings', [AttendanceSettingController::class, 'edit'])->name('settings.edit');
+    Route::put('settings', [AttendanceSettingController::class, 'update'])->name('settings.update');
+
+    Route::get('holidays', [AttendanceHolidayController::class, 'index'])->name('holidays.index');
+    Route::get('monthly', [AttendanceController::class, 'monthly'])->name('monthly');
+    Route::get('yearly', [AttendanceController::class, 'yearly'])->name('yearly');
+    Route::get('export/detail', [AttendanceController::class, 'exportDetail'])->name('export.detail');
+    Route::get('export/monthly', [AttendanceController::class, 'exportMonthly'])->name('export.monthly');
+    Route::get('export/yearly', [AttendanceController::class, 'exportYearly'])->name('export.yearly');
+    Route::get('create', [AttendanceController::class, 'create'])->name('create');
+    Route::post('/', [AttendanceController::class, 'store'])->name('store');
+    Route::get('/', [AttendanceController::class, 'index'])->name('index');
+    Route::get('{attendance}/edit', [AttendanceController::class, 'edit'])->name('edit');
+    Route::put('{attendance}', [AttendanceController::class, 'update'])->name('update');
 });
 
 Route::middleware('permission:manage lapak')->group(function () {
@@ -118,6 +176,12 @@ Route::middleware('permission:manage lapak')->group(function () {
 Route::middleware('permission:manage wisata')->group(function () {
     Route::resource('wisata', TourismController::class)->parameters([
         'wisata' => 'tourism',
+    ]);
+});
+
+Route::middleware('permission:manage galeri')->group(function () {
+    Route::resource('galeri', GalleryController::class)->parameters([
+        'galeri' => 'gallery',
     ]);
 });
 

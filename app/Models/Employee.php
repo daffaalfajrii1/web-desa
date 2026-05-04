@@ -24,6 +24,7 @@ class Employee extends Model
         'sort_order',
         'is_active',
         'attendance_pin',
+        'pin_absensi',
     ];
 
     protected function casts(): array
@@ -36,5 +37,25 @@ class Employee extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function scopeActiveWithAttendancePin($query)
+    {
+        return $query
+            ->where('is_active', true)
+            ->whereNotNull('pin_absensi')
+            ->where('pin_absensi', '!=', '');
+    }
+
+    public function scopeOrderedForAttendance($query)
+    {
+        return $query
+            ->orderBy('sort_order')
+            ->orderBy('name');
     }
 }

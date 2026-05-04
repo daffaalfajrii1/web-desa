@@ -141,13 +141,14 @@
 
     <div class="col-md-4">
         <div class="form-group">
-            <label>PIN Absensi</label>
-            <input type="text" name="attendance_pin" class="form-control @error('attendance_pin') is-invalid @enderror"
-                   value="{{ old('attendance_pin', $item->attendance_pin ?? '') }}">
-            @error('attendance_pin')
+            <label>PIN Absensi <span class="text-danger">*</span></label>
+            <input type="text" name="pin_absensi" class="form-control @error('pin_absensi') is-invalid @enderror"
+                   value="{{ old('pin_absensi', $item->pin_absensi ?? $item->attendance_pin ?? '') }}"
+                   required minlength="4" maxlength="20">
+            @error('pin_absensi')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="text-muted">Disiapkan untuk fitur absensi.</small>
+            <small class="text-muted">Wajib diisi agar pegawai bisa digunakan untuk absensi.</small>
         </div>
     </div>
 

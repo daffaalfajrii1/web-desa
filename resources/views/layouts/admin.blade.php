@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+@php
+    $adminVillageSetting = \App\Models\VillageSetting::query()->first();
+    $adminVillageName = $adminVillageSetting?->village_name ?: 'Web Desa';
+    $adminBrandName = $adminVillageName . ' Admin';
+    $adminLogoUrl = $adminVillageSetting?->logo_url ?: 'https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png';
+@endphp
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Web Desa')</title>
+    <title>@hasSection('title')@yield('title') - {{ $adminBrandName }}@else{{ $adminBrandName }}@endif</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
@@ -42,13 +48,21 @@
         }
 
         .brand-link .brand-text {
+            display: inline-block;
+            max-width: 180px;
+            overflow: hidden;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
             font-weight: 600 !important;
             letter-spacing: .2px;
             color: #fff;
         }
 
         .brand-image {
-            object-fit: cover;
+            object-fit: contain;
+            background: #fff;
+            padding: 2px;
         }
 
         .sidebar {
@@ -280,12 +294,12 @@
     <aside class="main-sidebar elevation-4">
         <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <img
-                src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png"
-                alt="Logo"
+                src="{{ $adminLogoUrl }}"
+                alt="Logo {{ $adminVillageName }}"
                 class="brand-image img-circle elevation-3"
                 style="opacity:.9"
             >
-            <span class="brand-text">Admin Desa</span>
+            <span class="brand-text">{{ $adminBrandName }}</span>
         </a>
 
         <div class="sidebar">
@@ -329,6 +343,13 @@
                                 <p>Identitas Desa</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.settings.desa-banners.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.settings.desa-banners.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-images"></i>
+                                <p>Banner Desa</p>
+                            </a>
+                        </li>
                     @endcan
 
                     @can('manage profil-desa')
@@ -362,7 +383,7 @@
                         </li>
                     @endcan
 
-                    @canany(['manage berita', 'manage pengumuman', 'manage agenda', 'manage produk-hukum', 'manage informasi-publik', 'manage ppid', 'manage lapak', 'manage wisata'])
+                    @canany(['manage berita', 'manage pengumuman', 'manage agenda', 'manage produk-hukum', 'manage informasi-publik', 'manage ppid', 'manage lapak', 'manage wisata', 'manage galeri'])
                         <li class="nav-header">Informasi</li>
                     @endcanany
 
@@ -498,10 +519,74 @@
                         </li>
                     @endcan
 
-                    @can('manage infografis')
-                        <li class="nav-item has-treeview {{ request()->routeIs('admin.hamlets.*') || request()->routeIs('admin.population-summaries.*') || request()->routeIs('admin.population-stats.*') || request()->routeIs('admin.apbdes.*') ? 'menu-open' : '' }}">
+                    @can('manage galeri')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.galeri.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.galeri.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-images"></i>
+                                <p>Galeri Desa</p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @php
+                        $isLayananActive = request()->routeIs('admin.layanan-mandiri.*', 'admin.pengaduan.*');
+                        $isInfografisActive = request()->routeIs(
+                            'admin.hamlets.*',
+                            'admin.population-summaries.*',
+                            'admin.population-stats.*',
+                            'admin.apbdes.*',
+                            'admin.bansos-program.*',
+                            'admin.bansos-recipient.*',
+                            'admin.bansos-chart.*',
+                            'admin.stunting-records.*',
+                            'admin.stunting-chart.*',
+                            'admin.idm-summaries.*',
+                            'admin.idm-indicators.*',
+                            'admin.sdgs-summaries.*',
+                            'admin.sdgs-goal-values.*'
+                        );
+                    @endphp
+
+                    @if(auth()->user()->can('manage layanan') || auth()->user()->hasRole('super_admin'))
+                        <li class="nav-header">Layanan</li>
+
+                        <li class="nav-item has-treeview {{ $isLayananActive ? 'menu-open' : '' }}">
                             <a href="#"
-                               class="nav-link {{ request()->routeIs('admin.hamlets.*') || request()->routeIs('admin.population-summaries.*') || request()->routeIs('admin.population-stats.*') || request()->routeIs('admin.apbdes.*') ? 'active' : '' }}"
+                               class="nav-link {{ $isLayananActive ? 'active' : '' }}"
+                               data-menu-key="layanan">
+                                <i class="nav-icon fas fa-concierge-bell"></i>
+                                <p>
+                                    Layanan
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.layanan-mandiri.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.layanan-mandiri.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Layanan Mandiri</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.pengaduan.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.pengaduan.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pengaduan</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+
+                    @can('manage infografis')
+                        <li class="nav-header">Infografis</li>
+
+                        <li class="nav-item has-treeview {{ $isInfografisActive ? 'menu-open' : '' }}">
+                            <a href="#"
+                               class="nav-link {{ $isInfografisActive ? 'active' : '' }}"
                                data-menu-key="infografis">
                                 <i class="nav-icon fas fa-chart-pie"></i>
                                 <p>
@@ -618,9 +703,9 @@
                         </li>
                     @endcan
 
-                    @canany(['manage sotk', 'manage absensi'])
+                    @can('manage sotk')
                         <li class="nav-header">Organisasi</li>
-                    @endcanany
+                    @endcan
 
                     @can('manage sotk')
                         <li class="nav-item">
@@ -633,11 +718,49 @@
                     @endcan
 
                     @can('manage absensi')
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
+                        <li class="nav-header">Manajemen Absen</li>
+
+                        <li class="nav-item has-treeview {{ request()->routeIs('admin.absensi.*') ? 'menu-open' : '' }}">
+                            <a href="#"
+                               class="nav-link {{ request()->routeIs('admin.absensi.*') ? 'active' : '' }}"
+                               data-menu-key="absensi">
                                 <i class="nav-icon fas fa-qrcode"></i>
-                                <p>Absensi</p>
+                                <p>
+                                    Absensi
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.absensi.input') }}"
+                                       class="nav-link {{ request()->routeIs('admin.absensi.input') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Input Absen</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.absensi.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.absensi.index', 'admin.absensi.edit', 'admin.absensi.monthly', 'admin.absensi.yearly') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Rekap Absensi</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.absensi.holidays.index') }}"
+                                       class="nav-link {{ request()->routeIs('admin.absensi.holidays.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Libur Nasional</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.absensi.settings.edit') }}"
+                                       class="nav-link {{ request()->routeIs('admin.absensi.settings.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Setting Absensi</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     @endcan
                 </ul>
@@ -664,7 +787,8 @@
     </div>
 
     <footer class="main-footer">
-        Web Desa Admin
+        <strong>Copyright &copy; {{ now()->year }} {{ $adminVillageName }}.</strong>
+        All rights reserved.
     </footer>
 </div>
 

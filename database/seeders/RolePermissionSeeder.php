@@ -28,7 +28,9 @@ class RolePermissionSeeder extends Seeder
     'manage absensi',
     'manage lapak',
     'manage wisata',
+    'manage galeri',
     'manage infografis',
+    'manage layanan',
 ];
 
         foreach ($permissions as $permission) {
@@ -51,7 +53,9 @@ class RolePermissionSeeder extends Seeder
             'manage informasi-publik',
             'manage lapak',
             'manage wisata',
+            'manage galeri',
             'manage infografis',
+            'manage layanan',
         ]);
 
         $operatorPpid->syncPermissions([

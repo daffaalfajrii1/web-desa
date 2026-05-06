@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -15,6 +16,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'photo_path',
     ];
 
     protected $hidden = [
@@ -33,4 +35,13 @@ class User extends Authenticatable
 {
     return $this->hasOne(\App\Models\Employee::class);
 }
+
+    public function getAdminPhotoUrlAttribute(): string
+    {
+        if ($this->photo_path) {
+            return Storage::url($this->photo_path);
+        }
+
+        return 'https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg';
+    }
 }

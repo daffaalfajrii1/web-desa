@@ -32,26 +32,33 @@
     <div class="col-md-6">
         <div class="form-group">
             <label>Jabatan <span class="text-danger">*</span></label>
-            <input type="text" name="position" required class="form-control @error('position') is-invalid @enderror"
-                   value="{{ old('position', $item->position ?? '') }}"
-                   placeholder="Contoh: Sekretaris Desa">
-            @error('position')
-                <div class="invalid-feedback">{{ $message }}</div>
+            <select name="employee_position_id" required class="form-control @error('employee_position_id') is-invalid @enderror">
+                <option value="">-- Pilih Jabatan --</option>
+                @foreach($positions as $position)
+                    <option value="{{ $position->id }}"
+                        {{ (string) old('employee_position_id', $item->employee_position_id ?? '') === (string) $position->id ? 'selected' : '' }}>
+                        {{ $position->name }}{{ $position->position_type ? ' - ' . $position->position_type : '' }}{{ ! $position->is_active ? ' (Nonaktif)' : '' }}
+                    </option>
+                @endforeach
+            </select>
+            @error('employee_position_id')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
             @enderror
+            <small class="text-muted">
+                Jabatan dibuat dari menu
+                <a href="{{ route('admin.jabatan-sotk.index') }}">Jabatan SOTK</a>
+                terlebih dahulu.
+            </small>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <label>Jenis Jabatan</label>
-            <input type="text" name="position_type" class="form-control @error('position_type') is-invalid @enderror"
-                   value="{{ old('position_type', $item->position_type ?? '') }}"
-                   placeholder="Contoh: kepala_desa / kasi / kaur / staf">
-            @error('position_type')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+    @if($positions->isEmpty())
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                Belum ada master jabatan aktif. Tambahkan jabatan SOTK sebelum menyimpan pegawai.
+            </div>
         </div>
-    </div>
+    @endif
 
     <div class="col-md-4">
         <div class="form-group">

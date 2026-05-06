@@ -260,6 +260,25 @@
 
     <div class="card identity-section">
         <div class="card-header">
+            <h3 class="card-title mb-0">Marquee / Teks Berjalan</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-0">
+                <label>Isi Marquee Beranda</label>
+                <textarea
+                    name="marquee_text"
+                    class="form-control @error('marquee_text') is-invalid @enderror"
+                    rows="4"
+                    placeholder="Contoh: Pelayanan kantor desa buka pukul 08.00 - 15.00"
+                >{{ old('marquee_text', $setting->marquee_text) }}</textarea>
+                @error('marquee_text')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                <small class="text-muted">Pisahkan tiap informasi dengan baris baru. Jika kosong, sistem memakai marquee otomatis.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card identity-section">
+        <div class="card-header">
             <h3 class="card-title mb-0">Branding Desa</h3>
         </div>
         <div class="card-body">
@@ -287,12 +306,13 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Tema Aktif</label>
-                        <select name="active_theme" class="form-control @error('active_theme') is-invalid @enderror">
-                            <option value="default" {{ old('active_theme', $setting->active_theme) === 'default' ? 'selected' : '' }}>Default</option>
-                            <option value="modern" {{ old('active_theme', $setting->active_theme) === 'modern' ? 'selected' : '' }}>Modern</option>
-                            <option value="classic" {{ old('active_theme', $setting->active_theme) === 'classic' ? 'selected' : '' }}>Classic</option>
+                        <select name="theme_active" class="form-control @error('theme_active') is-invalid @enderror">
+                            @php($selectedTheme = old('theme_active', $setting->theme_active ?: $setting->active_theme ?: 'default'))
+                            <option value="default" {{ $selectedTheme === 'default' ? 'selected' : '' }}>Default</option>
+                            <option value="blue" {{ $selectedTheme === 'blue' ? 'selected' : '' }}>Blue</option>
+                            <option value="earth" {{ $selectedTheme === 'earth' ? 'selected' : '' }}>Earth</option>
                         </select>
-                        @error('active_theme')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        @error('theme_active')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <a href="{{ route('admin.settings.desa-banners.index') }}" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-images mr-1"></i> Kelola Banner Public

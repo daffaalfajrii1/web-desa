@@ -30,9 +30,11 @@ class VillageSetting extends Model
         'welcome_message',
         'vision',
         'mission',
+        'marquee_text',
         'map_embed',
         'latitude',
         'longitude',
+        'theme_active',
         'active_theme',
     ];
 
@@ -69,6 +71,41 @@ class VillageSetting extends Model
         }
 
         return Storage::url($path);
+    }
+
+    public function getHeadPhotoUrlAttribute(): ?string
+    {
+        $path = $this->head_photo;
+
+        if (! $path) {
+            return null;
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://', '/'])) {
+            return $path;
+        }
+
+        return Storage::url($path);
+    }
+
+    /**
+     * Foto kepala desa: pegawai terpilih, lalu unggahan manual.
+     */
+    public function resolvePublicHeadPhotoUrl(): ?string
+    {
+        $employee = $this->relationLoaded('villageHeadEmployee')
+            ? $this->villageHeadEmployee
+            : $this->villageHeadEmployee()->first();
+
+        if ($employee && $employee->photo) {
+            $p = $employee->photo;
+
+            return Str::startsWith($p, ['http://', 'https://', '/'])
+                ? $p
+                : Storage::url($p);
+        }
+
+        return $this->head_photo_url;
     }
 
     public function getEmbedMapAttribute(): ?string

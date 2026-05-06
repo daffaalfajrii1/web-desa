@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\IdmSummary;
 use App\Models\IdmIndicator;
+use App\Models\IdmSummary;
+use Illuminate\Database\Seeder;
 
 class IdmDummySeeder extends Seeder
 {

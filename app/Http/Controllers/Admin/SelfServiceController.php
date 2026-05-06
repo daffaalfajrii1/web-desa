@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SelfService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class SelfServiceController extends Controller
 {
@@ -23,6 +26,9 @@ class SelfServiceController extends Controller
                 $q->where(function ($query) use ($search) {
                     $query->where('service_name', 'like', '%' . $search . '%')
                         ->orWhere('service_code', 'like', '%' . $search . '%');
+                    if (Schema::hasColumn('self_services', 'slug')) {
+                        $query->orWhere('slug', 'like', '%' . $search . '%');
+                    }
                 });
             })
             ->orderBy('sort_order')
@@ -43,8 +49,17 @@ class SelfServiceController extends Controller
 
     public function store(Request $request)
     {
+        $this->mergeNormalizedSlug($request);
+
         $data = $request->validate([
             'service_name' => 'required|string|max:255',
+            'slug' => [
+                'nullable',
+                'string',
+                'max:120',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                Rule::unique('self_services', 'slug'),
+            ],
             'description' => 'nullable|string',
             'requirements' => 'nullable|string',
             'is_active' => 'nullable|boolean',
@@ -53,6 +68,7 @@ class SelfServiceController extends Controller
 
         $data['is_active'] = $request->boolean('is_active');
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        $data['slug'] = $data['slug'] !== null ? (string) $data['slug'] : null;
 
         SelfService::create($data);
 
@@ -68,8 +84,17 @@ class SelfServiceController extends Controller
 
     public function update(Request $request, SelfService $self_service)
     {
+        $this->mergeNormalizedSlug($request);
+
         $data = $request->validate([
             'service_name' => 'required|string|max:255',
+            'slug' => [
+                'nullable',
+                'string',
+                'max:120',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                Rule::unique('self_services', 'slug')->ignore($self_service->id),
+            ],
             'description' => 'nullable|string',
             'requirements' => 'nullable|string',
             'is_active' => 'nullable|boolean',
@@ -78,6 +103,7 @@ class SelfServiceController extends Controller
 
         $data['is_active'] = $request->boolean('is_active');
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        $data['slug'] = $data['slug'] !== null ? (string) $data['slug'] : null;
 
         $self_service->update($data);
 
@@ -93,5 +119,18 @@ class SelfServiceController extends Controller
         return redirect()
             ->route('admin.layanan-mandiri.index')
             ->with('success', 'Layanan mandiri berhasil dihapus.');
+    }
+
+    private function mergeNormalizedSlug(Request $request): void
+    {
+        $raw = trim((string) $request->input('slug', ''));
+        if ($raw === '') {
+            $request->merge(['slug' => null]);
+
+            return;
+        }
+
+        $normalized = Str::slug($raw);
+        $request->merge(['slug' => $normalized !== '' ? $normalized : null]);
     }
 }

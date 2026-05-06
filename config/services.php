@@ -35,6 +35,14 @@ return [
         ],
     ],
 
+    /*
+    | Google reCAPTCHA v2 Checkbox — opsional untuk form publik (mis. layanan mandiri).
+    */
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
     'holiday_api' => [
         'url' => env('INDONESIA_HOLIDAY_API_URL', 'https://api-harilibur.vercel.app/api?year={year}'),
         'fallback_urls' => [

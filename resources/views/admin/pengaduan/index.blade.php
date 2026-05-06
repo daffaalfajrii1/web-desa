@@ -145,8 +145,8 @@
                             <td>{{ $loop->iteration + ($items->firstItem() ?? 0) - 1 }}</td>
                             <td>
                                 <strong>{{ $item->complaint_code }}</strong>
-                                @if($item->attachment)
-                                    <br><span class="badge badge-info mt-1"><i class="fas fa-paperclip"></i> Lampiran</span>
+                                @if($item->hasAttachments())
+                                    <br><span class="badge badge-info mt-1"><i class="fas fa-paperclip"></i> {{ count($item->attachmentPaths()) }} lampiran</span>
                                 @endif
                             </td>
                             <td>

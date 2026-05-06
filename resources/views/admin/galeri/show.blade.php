@@ -20,8 +20,16 @@
     <div class="card-body">
         <div class="row">
             <div class="col-lg-8 mb-4">
-                @if($item->is_photo && $item->image_path)
-                    <img src="{{ asset('storage/' . $item->image_path) }}" class="img-fluid rounded w-100" style="max-height: 560px; object-fit: cover;" alt="{{ $item->title }}">
+                @if($item->is_photo && $item->photoPathsList() !== [])
+                    <div class="row">
+                        @foreach ($item->photoPathsList() as $path)
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ asset('storage/'.$path) }}" target="_blank" rel="noopener">
+                                    <img src="{{ asset('storage/'.$path) }}" class="img-fluid rounded w-100 border" style="max-height: 280px; object-fit: cover;" alt="{{ $item->title }}">
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
                 @elseif($item->is_video && $item->youtube_embed_url)
                     <div class="embed-responsive embed-responsive-16by9 rounded">
                         <iframe class="embed-responsive-item" src="{{ $item->youtube_embed_url }}" allowfullscreen title="{{ $item->title }}"></iframe>
@@ -45,7 +53,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <span class="badge {{ $item->is_photo ? 'badge-success' : 'badge-danger' }}">
-                                {{ $item->is_photo ? 'Foto' : 'Video YouTube' }}
+                                {{ $item->is_photo ? 'Album foto' : 'Video YouTube' }}
                             </span>
                             <span class="badge {{ $item->status === 'published' ? 'badge-primary' : 'badge-secondary' }}">
                                 {{ $item->status_label }}
@@ -55,12 +63,15 @@
                             @endif
                         </div>
 
+                        @if($item->is_photo)
+                            <p><strong>Jumlah foto:</strong><br>{{ $item->photoCount() }}</p>
+                        @endif
+
                         <p><strong>Slug:</strong><br>{{ $item->slug }}</p>
                         <p><strong>Lokasi:</strong><br>{{ $item->location ?: '-' }}</p>
-                        <p><strong>Tanggal Dokumentasi:</strong><br>{{ $item->taken_at?->format('d-m-Y') ?: '-' }}</p>
-                        <p><strong>Urutan:</strong><br>{{ $item->sort_order }}</p>
-                        <p><strong>Dibuat Oleh:</strong><br>{{ $item->author?->name ?: '-' }}</p>
-                        <p><strong>Published At:</strong><br>{{ $item->published_at?->format('d-m-Y H:i') ?: '-' }}</p>
+                        <p><strong>Tanggal dokumentasi:</strong><br>{{ $item->taken_at?->format('d-m-Y') ?: '-' }}</p>
+                        <p><strong>Dibuat oleh:</strong><br>{{ $item->author?->name ?: '-' }}</p>
+                        <p><strong>Publikasi:</strong><br>{{ $item->published_at?->format('d-m-Y H:i') ?: '-' }}</p>
 
                         @if($item->is_video && $item->youtube_url)
                             <p class="mb-0">

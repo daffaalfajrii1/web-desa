@@ -28,6 +28,7 @@
             <div class="col-md-6">
                 <p><strong>Nama:</strong> {{ $item->name }}</p>
                 <p><strong>Jabatan:</strong> {{ $item->position }}</p>
+                <p><strong>Master Jabatan:</strong> {{ $item->employeePosition?->name ?? '-' }}</p>
                 <p><strong>Jenis Jabatan:</strong> {{ $item->position_type ?? '-' }}</p>
                 <p><strong>NIP / NIK:</strong> {{ $item->nip ?? '-' }}</p>
                 <p><strong>Email:</strong> {{ $item->email ?? '-' }}</p>

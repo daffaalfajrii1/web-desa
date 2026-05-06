@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
@@ -14,24 +14,24 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
-    'manage users',
-    'manage roles',
-    'manage settings',
-    'manage profil-desa',
-    'manage berita',
-    'manage pengumuman',
-    'manage agenda',
-    'manage produk-hukum',
-    'manage informasi-publik',
-    'manage ppid',
-    'manage sotk',
-    'manage absensi',
-    'manage lapak',
-    'manage wisata',
-    'manage galeri',
-    'manage infografis',
-    'manage layanan',
-];
+            'manage users',
+            'manage roles',
+            'manage settings',
+            'manage profil-desa',
+            'manage berita',
+            'manage pengumuman',
+            'manage agenda',
+            'manage produk-hukum',
+            'manage informasi-publik',
+            'manage ppid',
+            'manage sotk',
+            'manage absensi',
+            'manage lapak',
+            'manage wisata',
+            'manage galeri',
+            'manage infografis',
+            'manage layanan',
+        ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);

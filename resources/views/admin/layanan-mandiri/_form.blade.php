@@ -24,6 +24,19 @@
 
     <div class="col-md-12">
         <div class="form-group">
+            <label>Slug URL publik</label>
+            <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror"
+                   value="{{ old('slug', $item->slug ?? '') }}"
+                   placeholder="contoh: surat-keterangan-domisili (kosongkan untuk otomatis)">
+            <small class="text-muted">Digunakan di alamat layanan mandiri seperti <strong>/layanan-mandiri/slug-ini</strong>. Hanya huruf kecil, angka, dan tanda minus.</small>
+            @error('slug')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group">
             <label>Deskripsi Layanan</label>
             <textarea name="description" rows="4" class="form-control @error('description') is-invalid @enderror" placeholder="Jelaskan fungsi layanan dan informasi singkat untuk pemohon.">{{ old('description', $item->description ?? '') }}</textarea>
             @error('description')

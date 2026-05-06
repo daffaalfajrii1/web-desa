@@ -29,4 +29,19 @@ class PpidRequest extends Model
     {
         return $this->belongsTo(User::class, 'handled_by');
     }
+
+    public static function statuses(): array
+    {
+        return [
+            'new' => 'Baru',
+            'processed' => 'Diproses',
+            'completed' => 'Selesai',
+            'rejected' => 'Ditolak',
+        ];
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return static::statuses()[$this->status] ?? ucfirst((string) $this->status);
+    }
 }

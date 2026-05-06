@@ -9,7 +9,7 @@
         <h3 class="card-title">Edit User</h3>
     </div>
 
-    <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

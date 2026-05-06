@@ -7,11 +7,12 @@
 @once
     <style>
         .gallery-dropzone {
+            position: relative;
             border: 2px dashed #b6c2d2;
             border-radius: 12px;
             background: #f8fafc;
             cursor: pointer;
-            min-height: 178px;
+            min-height: 140px;
             padding: 24px;
             transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
         }
@@ -33,14 +34,6 @@
             background: #e8f1ff;
             color: #0d6efd;
             font-size: 26px;
-        }
-
-        .gallery-file-input {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
         }
 
         .gallery-preview-grid {
@@ -180,25 +173,25 @@
 
     <div class="col-md-6" id="photo_fields">
         <div class="form-group">
-            <label>{{ $isEdit ? 'Kelola Foto' : 'Upload Foto' }}</label>
+            <label>{{ $isEdit ? 'Tambah foto ke album' : 'Upload foto (satu album)' }} @if (! $isEdit)<span class="text-danger">*</span>@endif</label>
+            <p class="small text-muted mb-2">{{ $isEdit ? 'Ambil beberapa file sekaligus atau seret foto ke kotak hijau untuk menambah ke batch yang sama.' : 'Semua foto di bawah akan masuk <strong>satu album</strong> (satu kartu di daftar). Pilih beberapa file sekali atau tambah lagi dengan kotak geser atau unggahan kedua.' }}</p>
             <input
                 type="file"
                 id="gallery_photo_input"
                 name="{{ $isEdit ? 'new_images[]' : 'images[]' }}"
                 accept="image/jpeg,image/png,image/webp"
-                class="gallery-file-input @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror @error('new_images') is-invalid @enderror @error('new_images.*') is-invalid @enderror"
+                class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror @error('new_images') is-invalid @enderror @error('new_images.*') is-invalid @enderror"
                 multiple
             >
 
-            <div id="gallery_dropzone" class="gallery-dropzone text-center" role="button" tabindex="0">
-                <div class="gallery-dropzone-icon mb-3">
-                    <i class="fas fa-cloud-upload-alt"></i>
+            <div id="gallery_dropzone" class="gallery-dropzone text-center mt-3" role="region" aria-label="Area seret foto">
+                <div class="gallery-dropzone-inner" style="pointer-events: none;">
+                    <div class="gallery-dropzone-icon mb-2">
+                        <i class="fas fa-arrows-alt"></i>
+                    </div>
+                    <div class="font-weight-bold mb-1">Seret &amp; lepas foto ke sini</div>
+                    <div class="text-muted small mb-0">Menambahkan ke daftar unggahan di atas tanpa menghapus pilihan sebelumnya</div>
                 </div>
-                <div class="h5 mb-1">{{ $isEdit ? 'Tarik foto tambahan ke sini' : 'Tarik beberapa foto ke sini' }}</div>
-                <div class="text-muted mb-3">{{ $isEdit ? 'foto baru akan ditambahkan sebagai item galeri baru' : 'atau pilih banyak foto dari perangkat' }}</div>
-                <button type="button" id="gallery_pick_button" class="btn btn-primary btn-sm">
-                    <i class="fas fa-images mr-1"></i> {{ $isEdit ? 'Tambah Foto' : 'Pilih Foto' }}
-                </button>
             </div>
 
             <div id="gallery_file_summary" class="alert alert-light border mt-3 mb-3">
@@ -219,17 +212,26 @@
             @error('new_images.*')
                 <div class="text-danger small">{{ $message }}</div>
             @enderror
+            @error('remove_photos.*')
+                <div class="text-danger small">{{ $message }}</div>
+            @enderror
 
-            @if(!empty($item?->image_path))
-                <div id="gallery_current_media" class="gallery-current-media mt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="small text-muted font-weight-bold">Foto Saat Ini</div>
-                        <div class="form-check mb-0">
-                            <input type="checkbox" name="delete_current_photo" value="1" class="form-check-input" id="delete_current_photo">
-                            <label for="delete_current_photo" class="form-check-label text-danger small">Hapus foto ini</label>
-                        </div>
+            @if($isEdit && $item->is_photo && $item->photoPathsList() !== [])
+                <div id="gallery_existing_photos" class="mt-3">
+                    <div class="small text-muted font-weight-bold mb-2">Foto dalam album (centang untuk hapus)</div>
+                    <div class="gallery-preview-grid">
+                        @foreach ($item->photoPathsList() as $path)
+                            <div class="gallery-preview-card gallery-current-media">
+                                <img src="{{ asset('storage/'.$path) }}" alt="">
+                                <div class="gallery-preview-meta">
+                                    <label class="small mb-0 text-danger d-flex align-items-center" style="gap:6px;">
+                                        <input type="checkbox" name="remove_photos[]" value="{{ $path }}" class="m-0">
+                                        Hapus
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" style="max-height: 260px;">
                 </div>
             @endif
         </div>
@@ -284,17 +286,6 @@
 
     <div class="col-md-3">
         <div class="form-group">
-            <label>Urutan</label>
-            <input type="number" name="sort_order" min="0" class="form-control @error('sort_order') is-invalid @enderror"
-                   value="{{ old('sort_order', $item->sort_order ?? 0) }}">
-            @error('sort_order')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="form-group">
             <label>Status <span class="text-danger">*</span></label>
             <select name="status" class="form-control @error('status') is-invalid @enderror">
                 <option value="draft" {{ $selectedStatus === 'draft' ? 'selected' : '' }}>Draft</option>
@@ -323,15 +314,13 @@
         const videoFields = document.getElementById('video_fields');
         const fileInput = document.getElementById('gallery_photo_input');
         const dropzone = document.getElementById('gallery_dropzone');
-        const pickButton = document.getElementById('gallery_pick_button');
         const previewGrid = document.getElementById('gallery_preview_grid');
         const fileSummary = document.getElementById('gallery_file_summary');
         const youtubeInput = document.getElementById('youtube_url');
         const youtubePreview = document.getElementById('youtube_preview_content');
-        const deleteCurrentPhoto = document.getElementById('delete_current_photo');
-        const currentMedia = document.getElementById('gallery_current_media');
         const isEdit = {{ $isEdit ? 'true' : 'false' }};
-        let selectedFiles = [];
+        /** @type {File[]} Akumulasi file agar dialog "buka file" tidak menimpa pilihan sebelumnya (penyebab satu request per foto). */
+        let stagedFiles = [];
 
         function toggleMediaFields() {
             const isVideo = mediaType.value === 'video';
@@ -347,38 +336,41 @@
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
-        function syncFileInput() {
-            if (typeof DataTransfer === 'undefined') {
+        function applyStagedToInput() {
+            if (typeof DataTransfer === 'undefined' || !fileInput) {
                 return;
             }
-
-            const dataTransfer = new DataTransfer();
-            selectedFiles.forEach(function(file) {
-                dataTransfer.items.add(file);
+            const dt = new DataTransfer();
+            stagedFiles.forEach(function (file) {
+                try {
+                    dt.items.add(file);
+                } catch (err) {
+                    /* abaikan duplikat yang ditolak browser */
+                }
             });
-            fileInput.files = dataTransfer.files;
+            fileInput.files = dt.files;
         }
 
         function renderFilePreview() {
             previewGrid.innerHTML = '';
 
-            if (selectedFiles.length === 0) {
+            if (stagedFiles.length === 0) {
                 fileSummary.textContent = isEdit ? 'Belum ada foto tambahan dipilih.' : 'Belum ada foto dipilih.';
                 return;
             }
 
             fileSummary.textContent = isEdit
-                ? selectedFiles.length + ' foto baru siap ditambahkan.'
-                : selectedFiles.length + ' foto siap diunggah.';
+                ? stagedFiles.length + ' foto baru siap ditambahkan.'
+                : stagedFiles.length + ' foto akan masuk ke satu album.';
 
-            selectedFiles.forEach(function(file, index) {
+            stagedFiles.forEach(function (file, index) {
                 const card = document.createElement('div');
                 card.className = 'gallery-preview-card';
 
                 const image = document.createElement('img');
                 image.src = URL.createObjectURL(file);
                 image.alt = file.name;
-                image.onload = function() {
+                image.onload = function () {
                     URL.revokeObjectURL(image.src);
                 };
 
@@ -397,9 +389,9 @@
                 remove.type = 'button';
                 remove.className = 'btn btn-outline-danger btn-xs btn-block';
                 remove.innerHTML = '<i class="fas fa-times mr-1"></i> Hapus';
-                remove.addEventListener('click', function() {
-                    selectedFiles.splice(index, 1);
-                    syncFileInput();
+                remove.addEventListener('click', function () {
+                    stagedFiles.splice(index, 1);
+                    applyStagedToInput();
                     renderFilePreview();
                 });
 
@@ -412,14 +404,14 @@
             });
         }
 
-        function addFiles(fileList) {
-            const imageFiles = Array.from(fileList).filter(function(file) {
+        function appendImageFiles(fileList) {
+            const imageFiles = Array.from(fileList).filter(function (file) {
                 return file.type.startsWith('image/');
             });
-
-            selectedFiles = selectedFiles.concat(imageFiles);
-
-            syncFileInput();
+            imageFiles.forEach(function (f) {
+                stagedFiles.push(f);
+            });
+            applyStagedToInput();
             renderFilePreview();
         }
 
@@ -458,6 +450,9 @@
         }
 
         function updateYoutubePreview() {
+            if (!youtubeInput || !youtubePreview) {
+                return;
+            }
             const youtubeId = extractYoutubeId(youtubeInput.value);
 
             if (!youtubeId || !/^[A-Za-z0-9_-]{11}$/.test(youtubeId)) {
@@ -474,57 +469,39 @@
 
         mediaType.addEventListener('change', toggleMediaFields);
 
-        pickButton.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        dropzone.addEventListener('click', function(event) {
-            if (event.target.closest('button')) {
-                return;
-            }
-
-            fileInput.click();
-        });
-
-        dropzone.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                fileInput.click();
-            }
-        });
-
-        fileInput.addEventListener('change', function(event) {
-            addFiles(event.target.files);
-        });
-
-        ['dragenter', 'dragover'].forEach(function(eventName) {
-            dropzone.addEventListener(eventName, function(event) {
-                event.preventDefault();
-                dropzone.classList.add('is-dragover');
+        if (fileInput) {
+            fileInput.addEventListener('change', function (event) {
+                appendImageFiles(event.target.files || []);
             });
-        });
+        }
 
-        ['dragleave', 'drop'].forEach(function(eventName) {
-            dropzone.addEventListener(eventName, function(event) {
+        if (dropzone) {
+            ['dragenter', 'dragover'].forEach(function (eventName) {
+                dropzone.addEventListener(eventName, function (event) {
+                    event.preventDefault();
+                    dropzone.classList.add('is-dragover');
+                });
+            });
+            dropzone.addEventListener('dragleave', function (event) {
                 event.preventDefault();
                 dropzone.classList.remove('is-dragover');
             });
-        });
-
-        dropzone.addEventListener('drop', function(event) {
-            addFiles(event.dataTransfer.files);
-        });
-
-        youtubeInput.addEventListener('input', updateYoutubePreview);
-
-        if (deleteCurrentPhoto && currentMedia) {
-            deleteCurrentPhoto.addEventListener('change', function() {
-                currentMedia.classList.toggle('is-marked-delete', deleteCurrentPhoto.checked);
+            dropzone.addEventListener('drop', function (event) {
+                event.preventDefault();
+                dropzone.classList.remove('is-dragover');
+                appendImageFiles(event.dataTransfer.files);
             });
+        }
+
+        if (youtubeInput) {
+            youtubeInput.addEventListener('input', updateYoutubePreview);
         }
 
         toggleMediaFields();
         renderFilePreview();
+        if (youtubeInput) {
+            updateYoutubePreview();
+        }
     });
 </script>
 @endpush

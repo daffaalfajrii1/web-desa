@@ -8,6 +8,7 @@ class Employee extends Model
 {
     protected $fillable = [
         'user_id',
+        'employee_position_id',
         'name',
         'position',
         'position_type',
@@ -37,6 +38,11 @@ class Employee extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function employeePosition()
+    {
+        return $this->belongsTo(EmployeePosition::class);
     }
 
     public function attendances()

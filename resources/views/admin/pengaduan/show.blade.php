@@ -53,11 +53,26 @@
             <div class="card-body">
                 <div class="complaint-body">{{ $item->complaint_text }}</div>
 
-                @if($item->attachment)
-                    <div class="mt-4">
-                        <a href="{{ asset('storage/' . $item->attachment) }}" target="_blank" class="btn btn-outline-info">
-                            <i class="fas fa-paperclip"></i> Lihat Lampiran
-                        </a>
+                @if($item->hasAttachments())
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="detail-label mb-3">Lampiran</div>
+                        <div class="d-flex flex-column gap-2">
+                            @foreach($item->attachmentPaths() as $path)
+                                @php
+                                    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION) ?: '');
+                                    $isPdf = $ext === 'pdf';
+                                    $url = asset('storage/' . $path);
+                                    $label = basename($path);
+                                @endphp
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <a href="{{ $url }}" target="_blank" rel="noopener" class="btn btn-outline-info btn-sm">
+                                        <i class="fas {{ $isPdf ? 'fa-file-pdf' : 'fa-image' }}"></i>
+                                        {{ $isPdf ? 'Buka PDF' : 'Lihat gambar' }} — {{ \Illuminate\Support\Str::limit($label, 40) }}
+                                    </a>
+                                    <a href="{{ $url }}" download class="btn btn-light btn-sm border" title="Unduh"><i class="fas fa-download"></i></a>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 @endif
             </div>

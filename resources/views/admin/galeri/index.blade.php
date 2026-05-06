@@ -195,6 +195,9 @@
                                 @if($item->is_featured)
                                     <span class="badge badge-warning">Unggulan</span>
                                 @endif
+                                @if($item->is_photo && $item->photoCount() > 1)
+                                    <span class="badge badge-secondary">{{ $item->photoCount() }} foto</span>
+                                @endif
                             </div>
 
                             <div class="gallery-title">{{ $item->title }}</div>
@@ -208,7 +211,7 @@
                         </div>
 
                         <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Urutan: {{ $item->sort_order }}</span>
+                            <span class="text-muted small">{{ $item->published_at?->format('d-m-Y H:i') ?: '-' }}</span>
                             <div>
                                 <a href="{{ route('admin.galeri.show', ['gallery' => $item->id]) }}" class="btn btn-info btn-sm" title="Detail">
                                     <i class="fas fa-eye"></i>

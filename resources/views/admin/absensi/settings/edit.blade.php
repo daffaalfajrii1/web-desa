@@ -122,8 +122,11 @@
                     <div class="custom-control custom-switch mb-3">
                         <input type="checkbox" name="validate_location" value="1" class="custom-control-input" id="validate_location"
                             {{ old('validate_location', $setting->validate_location) ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="validate_location">Validasi radius lokasi</label>
+                        <label class="custom-control-label" for="validate_location">Validasi radius lokasi (GPS)</label>
                     </div>
+                    <small class="form-text text-muted d-block" style="margin-top:-0.5rem;">
+                        Nonaktifkan agar pegawai bisa absen dari mana saja tanpa pemeriksaan jarak ke kantor/desa. Halaman publik tidak akan meminta izin lokasi perangkat.
+                    </small>
                 </div>
 
                 <div class="col-md-4">

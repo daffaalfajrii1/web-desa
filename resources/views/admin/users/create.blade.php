@@ -11,7 +11,7 @@
         <h3 class="card-title">Tambah User</h3>
     </div>
 
-    <form action="{{ route('admin.users.store') }}" method="POST">
+    <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="card-body">

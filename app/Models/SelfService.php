@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class SelfService extends Model
 {
     protected $fillable = [
         'service_code',
         'service_name',
+        'slug',
         'description',
         'requirements',
         'is_active',
@@ -28,7 +30,33 @@ class SelfService extends Model
             if (empty($service->service_code)) {
                 $service->service_code = static::generateCode();
             }
+            if (trim((string) ($service->slug ?? '')) === '') {
+                $base = Str::slug((string) $service->service_name) ?: 'layanan';
+                $service->slug = static::ensureUniqueSlug($base, null);
+            }
         });
+
+        static::updating(function (SelfService $service) {
+            if (trim((string) ($service->slug ?? '')) === '') {
+                $base = Str::slug((string) $service->service_name) ?: 'layanan';
+                $service->slug = static::ensureUniqueSlug($base, $service->id);
+            }
+        });
+    }
+
+    public static function ensureUniqueSlug(string $base, ?int $exceptId): string
+    {
+        $slug = $base;
+        $i = 2;
+        while (static::query()
+            ->where('slug', $slug)
+            ->when($exceptId, fn ($q) => $q->where('id', '!=', $exceptId))
+            ->exists()) {
+            $slug = $base.'-'.$i;
+            $i++;
+        }
+
+        return $slug;
     }
 
     public static function generateCode(): string

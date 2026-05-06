@@ -7,9 +7,14 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">Data Pegawai / SOTK</h3>
-        <a href="{{ route('admin.pegawai.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> Tambah Pegawai
-        </a>
+        <div>
+            <a href="{{ route('admin.jabatan-sotk.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-briefcase"></i> Jabatan SOTK
+            </a>
+            <a href="{{ route('admin.pegawai.create') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Tambah Pegawai
+            </a>
+        </div>
     </div>
 
     <div class="card-body">

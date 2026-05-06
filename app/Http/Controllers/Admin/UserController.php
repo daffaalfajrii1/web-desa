@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -42,12 +43,18 @@ class UserController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
+
+        $photoPath = $request->hasFile('photo')
+            ? $request->file('photo')->store('users/photos', 'public')
+            : null;
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'photo_path' => $photoPath,
             'email_verified_at' => now(),
         ]);
 
@@ -70,11 +77,28 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|exists:roles,name',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'remove_photo' => 'nullable|boolean',
         ]);
+
+        $newPhotoPath = $user->photo_path;
+        if ($request->boolean('remove_photo') && $user->photo_path) {
+            if (Storage::disk('public')->exists($user->photo_path)) {
+                Storage::disk('public')->delete($user->photo_path);
+            }
+            $newPhotoPath = null;
+        }
+        if ($request->hasFile('photo')) {
+            if ($newPhotoPath && Storage::disk('public')->exists($newPhotoPath)) {
+                Storage::disk('public')->delete($newPhotoPath);
+            }
+            $newPhotoPath = $request->file('photo')->store('users/photos', 'public');
+        }
 
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
+            'photo_path' => $newPhotoPath,
         ]);
 
         $user->syncRoles([$data['role']]);

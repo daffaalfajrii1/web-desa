@@ -5,12 +5,23 @@
     $adminVillageName = $adminVillageSetting?->village_name ?: 'Web Desa';
     $adminBrandName = $adminVillageName . ' Admin';
     $adminLogoUrl = $adminVillageSetting?->logo_url ?: 'https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png';
+    $adminHasFavicon = (bool) ($adminVillageSetting?->favicon || $adminVillageSetting?->logo_path || $adminVillageSetting?->logo);
+    $adminIconBuster = (string) (($adminVillageSetting?->updated_at?->timestamp) ?: time());
+    $adminTabIconUrl = $adminVillageSetting?->logo_url;
+    if ($adminTabIconUrl && \Illuminate\Support\Str::startsWith($adminTabIconUrl, '/')) {
+        $adminTabIconUrl = url($adminTabIconUrl);
+    }
+    $adminTabIconUrl = $adminTabIconUrl ? $adminTabIconUrl.(str_contains($adminTabIconUrl, '?') ? '&' : '?').'v='.$adminIconBuster : null;
 @endphp
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title')@yield('title') - {{ $adminBrandName }}@else{{ $adminBrandName }}@endif</title>
+    @if ($adminHasFavicon && $adminTabIconUrl)
+        <link rel="icon" href="{{ $adminTabIconUrl }}" sizes="any">
+        <link rel="shortcut icon" href="{{ $adminTabIconUrl }}">
+    @endif
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
@@ -280,6 +291,11 @@
         </ul>
 
         <ul class="navbar-nav ml-auto align-items-center">
+            <li class="nav-item mr-1">
+                <a href="{{ route('admin.users.edit', auth()->id()) }}" class="btn btn-link nav-link" style="border:none;">
+                    <i class="fas fa-user-edit mr-1"></i> Edit Admin
+                </a>
+            </li>
             <li class="nav-item">
                 <form method="POST" action="{{ route('logout') }}" class="mb-0">
                     @csrf
@@ -306,9 +322,10 @@
             <div class="user-panel mt-3 mb-3 d-flex align-items-center">
                 <div class="image">
                     <img
-                        src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg"
+                        src="{{ auth()->user()->admin_photo_url }}"
                         class="img-circle elevation-2"
                         alt="User Image"
+                        style="width:34px;height:34px;object-fit:cover;"
                     >
                 </div>
                 <div class="info">
@@ -708,6 +725,13 @@
                     @endcan
 
                     @can('manage sotk')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.jabatan-sotk.index') }}"
+                               class="nav-link {{ request()->routeIs('admin.jabatan-sotk.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-briefcase"></i>
+                                <p>Jabatan SOTK</p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.pegawai.index') }}"
                                class="nav-link {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">

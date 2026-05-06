@@ -15,7 +15,7 @@ class Complaint extends Model
         'address',
         'subject',
         'complaint_text',
-        'attachment',
+        'attachments',
         'status',
         'admin_note',
         'submitted_at',
@@ -25,9 +25,26 @@ class Complaint extends Model
     protected function casts(): array
     {
         return [
+            'attachments' => 'array',
             'submitted_at' => 'datetime',
             'resolved_at' => 'datetime',
         ];
+    }
+
+    /** @return array<int, string> */
+    public function attachmentPaths(): array
+    {
+        $raw = $this->attachments;
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        return array_values(array_filter($raw, static fn ($path) => is_string($path) && $path !== ''));
+    }
+
+    public function hasAttachments(): bool
+    {
+        return $this->attachmentPaths() !== [];
     }
 
     protected static function booted(): void

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Shop extends Model
 {
@@ -47,5 +48,22 @@ class Shop extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getWhatsappUrlAttribute(): ?string
+    {
+        $phone = preg_replace('/\D+/', '', (string) $this->whatsapp);
+
+        if ($phone === '') {
+            return null;
+        }
+
+        if (Str::startsWith($phone, '0')) {
+            $phone = '62'.substr($phone, 1);
+        } elseif (Str::startsWith($phone, '8')) {
+            $phone = '62'.$phone;
+        }
+
+        return 'https://wa.me/'.$phone;
     }
 }

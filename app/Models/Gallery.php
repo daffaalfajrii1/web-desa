@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Gallery extends Model
 {
     public const TYPE_PHOTO = 'photo';
+
     public const TYPE_VIDEO = 'video';
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PUBLISHED = 'published';
 
     protected $fillable = [
@@ -17,14 +19,15 @@ class Gallery extends Model
         'slug',
         'media_type',
         'image_path',
+        'photo_paths',
         'youtube_url',
         'youtube_id',
         'description',
         'location',
         'taken_at',
-        'sort_order',
         'is_featured',
         'status',
+        'views',
         'published_at',
         'created_by',
     ];
@@ -32,16 +35,54 @@ class Gallery extends Model
     protected function casts(): array
     {
         return [
+            'photo_paths' => 'array',
             'taken_at' => 'date',
-            'sort_order' => 'integer',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
+            'views' => 'integer',
         ];
     }
 
     public function author()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** @return list<string> Stored paths relative to public disk */
+    public function photoPathsList(): array
+    {
+        if ($this->media_type !== self::TYPE_PHOTO) {
+            return [];
+        }
+
+        $list = $this->photo_paths;
+        if (is_array($list) && $list !== []) {
+            $clean = [];
+            foreach ($list as $p) {
+                if (is_string($p) && $p !== '') {
+                    $clean[] = $p;
+                }
+            }
+
+            return array_values(array_unique($clean));
+        }
+
+        if (is_string($this->image_path) && $this->image_path !== '') {
+            return [$this->image_path];
+        }
+
+        return [];
+    }
+
+    /** @return list<string> Full URLs for Blade/JS */
+    public function photoUrls(): array
+    {
+        return array_map(fn ($p) => asset('storage/'.$p), $this->photoPathsList());
+    }
+
+    public function photoCount(): int
+    {
+        return count($this->photoPathsList());
     }
 
     public function getIsPhotoAttribute(): bool
@@ -60,7 +101,7 @@ class Gallery extends Model
             return null;
         }
 
-        return 'https://www.youtube.com/embed/' . $this->youtube_id;
+        return 'https://www.youtube.com/embed/'.$this->youtube_id;
     }
 
     public function getYoutubeThumbnailUrlAttribute(): ?string
@@ -69,13 +110,16 @@ class Gallery extends Model
             return null;
         }
 
-        return 'https://img.youtube.com/vi/' . $this->youtube_id . '/hqdefault.jpg';
+        return 'https://img.youtube.com/vi/'.$this->youtube_id.'/hqdefault.jpg';
     }
 
     public function getMediaUrlAttribute(): ?string
     {
-        if ($this->is_photo && $this->image_path) {
-            return asset('storage/' . $this->image_path);
+        if ($this->is_photo) {
+            $paths = $this->photoPathsList();
+            $first = $paths[0] ?? null;
+
+            return $first ? asset('storage/'.$first) : null;
         }
 
         return $this->youtube_thumbnail_url;

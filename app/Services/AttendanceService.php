@@ -14,10 +14,9 @@ class AttendanceService
     public function __construct(
         private readonly HolidayService $holidayService,
         private readonly LocationService $locationService
-    ) {
-    }
+    ) {}
 
-    public function checkIn(Employee $employee, string $pin, ?float $latitude = null, ?float $longitude = null): array
+    public function checkIn(Employee $employee, string $pin, ?float $latitude = null, ?float $longitude = null, string $source = 'admin'): array
     {
         $this->assertEmployeeCanAttend($employee, $pin);
 
@@ -71,7 +70,7 @@ class AttendanceService
                 'distance_meter' => $location['distance_meter'],
                 'is_holiday' => false,
                 'holiday_name' => null,
-                'source' => 'admin',
+                'source' => $source,
             ]
         );
 
@@ -81,7 +80,7 @@ class AttendanceService
         ];
     }
 
-    public function checkOut(Employee $employee, string $pin, ?float $latitude = null, ?float $longitude = null): array
+    public function checkOut(Employee $employee, string $pin, ?float $latitude = null, ?float $longitude = null, string $source = 'admin'): array
     {
         $this->assertEmployeeCanAttend($employee, $pin);
 
@@ -128,6 +127,28 @@ class AttendanceService
             'attendance' => $attendance,
             'message' => 'Check out berhasil disimpan.',
         ];
+    }
+
+    /**
+     * Apakah waktu saat ini sudah memenuhi syarat check-in (tidak sebelum jam mulai masuk).
+     */
+    public function canCheckInNow(?Carbon $moment = null): bool
+    {
+        $moment = $moment ?? now();
+        $setting = AttendanceSetting::current();
+
+        return ! $this->isBeforeTime($moment, $setting->check_in_start);
+    }
+
+    /**
+     * Apakah waktu saat ini dalam rentang jam pulang (sama dengan validasi server).
+     */
+    public function canCheckOutNow(?Carbon $moment = null): bool
+    {
+        $moment = $moment ?? now();
+        $setting = AttendanceSetting::current();
+
+        return $this->isInTimeRange($moment, $setting->check_out_start, $setting->check_out_end);
     }
 
     public function markAlphaForDate(Carbon|string|null $date = null): array
@@ -291,7 +312,7 @@ class AttendanceService
     {
         $time = $time instanceof DateTimeInterface
             ? $time->format('H:i:s')
-            : (strlen($time) === 5 ? $time . ':00' : substr($time, 0, 8));
+            : (strlen($time) === 5 ? $time.':00' : substr($time, 0, 8));
 
         return $date->copy()->setTimeFromTimeString($time);
     }
